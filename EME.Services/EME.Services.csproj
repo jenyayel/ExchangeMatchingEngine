@@ -40,7 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="LimitOrders\ILimitOrdersProcessor.cs" />
-    <Compile Include="LimitOrders\ILimitOrdersRepository.cs" />
     <Compile Include="MarketOrders\IMarketOrdersProcessor.cs" />
     <Compile Include="IMatchingEngine.cs" />
     <Compile Include="LimitOrders\LimitOrdersProcessor.cs" />

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EME.Infrastructure
+namespace EME.Infrastructure.Persistance
 {
     public class InMemoryRepository<T> : IRepository<T>
     {

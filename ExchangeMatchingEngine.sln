@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EME.Services", "EME.Service
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EME.Tests", "EME.Tests\EME.Tests.csproj", "{D8F3059D-FA49-453D-9AA8-8CFF841E205E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EME.Application", "EME.Application\EME.Application.csproj", "{CEDCD848-C7DD-44B3-BE89-81DDDCD7661C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D8F3059D-FA49-453D-9AA8-8CFF841E205E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8F3059D-FA49-453D-9AA8-8CFF841E205E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8F3059D-FA49-453D-9AA8-8CFF841E205E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEDCD848-C7DD-44B3-BE89-81DDDCD7661C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEDCD848-C7DD-44B3-BE89-81DDDCD7661C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEDCD848-C7DD-44B3-BE89-81DDDCD7661C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEDCD848-C7DD-44B3-BE89-81DDDCD7661C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

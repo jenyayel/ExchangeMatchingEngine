@@ -14,12 +14,15 @@ namespace EME.Models
     {
         public decimal Price { get; private set; }
 
+        public int PartitionKey { get; private set; }
+
         public LimitOrder(OrderType orderType, string symbol, int shares, decimal price)
             : base(orderType, symbol, shares)
         {
             if (price <= 0) throw new ArgumentOutOfRangeException("price");
 
             this.Price = price;
+            this.PartitionKey = symbol.GetHashCode();
         }
 
         public override string ToString()

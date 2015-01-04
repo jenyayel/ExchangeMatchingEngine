@@ -65,17 +65,17 @@ namespace EME.Tests.Models
             for (int i = 0; i < 10; i++)
                 _book.AddOrder(new LimitOrder(
                     OrderType.Sell,
-                    "MSTS",
+                    "MSFT",
                     10,
                     (decimal)(m_random.NextDouble() * (50 - 0.9) + 0.9)));
 
             // add a few with same price
-            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSTS", 10, (decimal)0.5));
-            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSTS", 10, (decimal)0.5));
-            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSTS", 10, 25));
-            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSTS", 10, 25));
-            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSTS", 10, 51));
-            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSTS", 10, 51));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, (decimal)0.5));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, (decimal)0.5));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 25));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 25));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 51));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 51));
 
             // --------------------------------
             // Assert
