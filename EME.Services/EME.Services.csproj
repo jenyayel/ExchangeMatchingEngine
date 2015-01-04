@@ -7,8 +7,8 @@
     <ProjectGuid>{21D9D17E-D9C6-4C12-9C9E-F08BD06148C8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EME.Domain</RootNamespace>
-    <AssemblyName>EME.Domain</AssemblyName>
+    <RootNamespace>EME.Services</RootNamespace>
+    <AssemblyName>EME.Services</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -39,16 +39,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LimitOrdersProcessor.cs" />
-    <Compile Include="MarketOrdersProcessor.cs" />
+    <Compile Include="LimitOrders\ILimitOrdersProcessor.cs" />
+    <Compile Include="LimitOrders\ILimitOrdersRepository.cs" />
+    <Compile Include="MarketOrders\IMarketOrdersProcessor.cs" />
+    <Compile Include="IMatchingEngine.cs" />
+    <Compile Include="LimitOrders\LimitOrdersProcessor.cs" />
+    <Compile Include="MarketOrders\MarketOrdersProcessor.cs" />
     <Compile Include="MatchingEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EME.Contracts\EME.Contracts.csproj">
-      <Project>{9cd53827-9b9c-4ee8-809e-28718ada1a39}</Project>
-      <Name>EME.Contracts</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EME.Infrastructure\EME.Infrastructure.csproj">
       <Project>{6210dbd8-f4a9-4281-a1f6-69bc34948f27}</Project>
       <Name>EME.Infrastructure</Name>

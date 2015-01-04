@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace EME.Models
 {
+    public enum OrderType
+    {
+        Buy = 0,
+        Sell = 1
+    }
+
     public abstract class Order
     {
         public Guid OrderId { get; private set; }
@@ -16,7 +22,7 @@ namespace EME.Models
 
         public OrderType OrderType { get; private set; }
 
-        public Order(OrderType orderType, string symbol, int shares)
+        protected Order(OrderType orderType, string symbol, int shares)
         {
             if (String.IsNullOrEmpty(symbol)) throw new ArgumentNullException("symbol");
             if (shares < 1) throw new ArgumentOutOfRangeException("shares");

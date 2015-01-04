@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EME.Models</RootNamespace>
-    <AssemblyName>EME.DomainModels</AssemblyName>
+    <AssemblyName>EME.Models</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -42,9 +42,7 @@
     <Compile Include="LimitOrder.cs" />
     <Compile Include="LimitOrdersBook.cs" />
     <Compile Include="MarketOrder.cs" />
-    <Compile Include="MarketOrdersQueue.cs" />
     <Compile Include="Order.cs" />
-    <Compile Include="OrderType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

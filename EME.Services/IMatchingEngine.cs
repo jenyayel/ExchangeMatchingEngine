@@ -1,13 +1,12 @@
-﻿using EME.Contracts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EME.Domain
+namespace EME.Services
 {
-    public class MatchingEngine : IMatchingEngine
+    public interface IMatchingEngine
     {
     }
 }

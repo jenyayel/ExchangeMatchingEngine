@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EME.Models
+namespace EME.Services
 {
-    public enum OrderType
+    public class MatchingEngine : IMatchingEngine
     {
-        Buy = 0,
-        Sell = 1
     }
 }
