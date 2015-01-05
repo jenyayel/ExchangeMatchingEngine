@@ -48,6 +48,7 @@
     <Compile Include="Events\LimitOrderPlacedEvent.cs" />
     <Compile Include="LimitOrdersBook.cs" />
     <Compile Include="MarketOrder.cs" />
+    <Compile Include="MarketOrdersQueue.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Commands\PlaceLimitOrderCommand.cs" />
     <Compile Include="Commands\PlaceMarketOrderCommand.cs" />

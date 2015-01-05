@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\JsonSerializer.cs" />
+    <Compile Include="Serialization\JsonSerializer.cs" />
     <Compile Include="Messaging\IMessageBusPublisher.cs" />
     <Compile Include="Messaging\IMessageBusSubscriber.cs" />
     <Compile Include="Messaging\NetMQPublisher.cs" />

@@ -4,6 +4,8 @@ using EME.Application;
 using NetMQ;
 using NetMQ.Sockets;
 using Autofac;
+using EME.Infrastructure.Serialization;
+using EME.Models.Commands;
 
 namespace EME.Tests.Application
 {
@@ -26,13 +28,19 @@ namespace EME.Tests.Application
 
             m_context = NetMQContext.Create();
             m_client = m_context.CreateRequestSocket();
-            m_client.Connect(commandsEndpoint);            
+            m_client.Connect(commandsEndpoint);
         }
 
         [TestMethod]
         public void FinalAcceptanceTest()
         {
-            m_client.Send("hi");
+            m_client.Send(new PlaceLimitOrderCommand
+            {
+                Type = 0,
+                Shares = 10,
+                Symbol = "MSFT",
+                Price = 50
+            }.ToJSONMessage());
         }
 
         public void Dispose()

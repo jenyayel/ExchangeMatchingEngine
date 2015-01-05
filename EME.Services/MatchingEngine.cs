@@ -14,6 +14,7 @@ namespace EME.Services
     public class MatchingEngine : IMatchingEngine
     {
         private LimitOrdersBook m_ordersBook;
+        private MarketOrdersQueue m_ordersQueue;
 
         private IMessageBusPublisher m_publisher;
         private IRepository<LimitOrder> m_limitOrdersRepository;
@@ -32,7 +33,9 @@ namespace EME.Services
             m_limitOrdersRepository = limitOrdersRepository;
             m_marketOrdersRepository = marketOrdersRepository;
 
+            // TODO: load from repository
             m_ordersBook = new LimitOrdersBook();
+            m_ordersQueue = new MarketOrdersQueue();
         }
 
         public void ProcessOrder(OrderType orderType, string symbol, int shares, double? price)
@@ -60,11 +63,11 @@ namespace EME.Services
             {
                 var _order = new MarketOrder(orderType, symbol, shares);
 
-                // TODO: add to queue
+                // add to queue
+                m_ordersQueue.AddOrder(_order);
 
                 // persist
                 m_marketOrdersRepository.Add(_order);
-
 
                 // fire event
                 m_publisher.Send(new MarketOrderPlacedEvent

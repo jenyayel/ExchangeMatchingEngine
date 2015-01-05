@@ -43,7 +43,7 @@ namespace EME.Application
             _builder
                .RegisterGeneric(typeof(InMemoryRepository<>))
                .As(typeof(IRepository<>))
-               .InstancePerLifetimeScope();
+               .SingleInstance();
 
             return _builder.Build();
         }
