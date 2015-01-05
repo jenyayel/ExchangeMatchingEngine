@@ -39,11 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LimitOrders\ILimitOrdersProcessor.cs" />
-    <Compile Include="MarketOrders\IMarketOrdersProcessor.cs" />
     <Compile Include="IMatchingEngine.cs" />
-    <Compile Include="LimitOrders\LimitOrdersProcessor.cs" />
-    <Compile Include="MarketOrders\MarketOrdersProcessor.cs" />
     <Compile Include="MatchingEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
