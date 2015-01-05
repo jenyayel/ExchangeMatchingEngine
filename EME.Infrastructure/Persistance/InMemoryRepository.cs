@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,11 +9,11 @@ namespace EME.Infrastructure.Persistance
 {
     public class InMemoryRepository<T> : IRepository<T>
     {
-        List<T> m_items;
+        BlockingCollection<T> m_items;
 
         public InMemoryRepository()
         {
-            m_items = new List<T>();
+            m_items = new BlockingCollection<T>();
         }
 
         public IQueryable<T> Query()
@@ -31,7 +32,8 @@ namespace EME.Infrastructure.Persistance
         {
             if (item == null) throw new ArgumentNullException("item");
 
-            m_items.Remove(item);
+            if (!m_items.TryTake(out item))
+                throw new TimeoutException();
         }
     }
 }

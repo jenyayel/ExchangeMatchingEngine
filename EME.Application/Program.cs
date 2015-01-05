@@ -1,14 +1,6 @@
 ﻿using Autofac;
-using EME.Infrastructure.Messaging;
-using EME.Infrastructure.Persistance;
-using EME.Services;
-using NetMQ;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace EME.Application
 {
@@ -21,37 +13,10 @@ namespace EME.Application
         {
             Console.Clear();
 
-            var _builder = new ContainerBuilder();
+            Trace.Listeners.Add(new ConsoleTraceListener());
 
-            _builder
-                .RegisterType<Application>()
-                .As<IApplication>()
-                .SingleInstance()
-                .WithParameter("endpoint", commandsEndpoint);
-
-            _builder
-                .RegisterInstance(NetMQContext.Create())
-                .As<NetMQContext>()
-                .SingleInstance();
-
-            _builder
-               .RegisterType<NetMQPublisher>()
-               .As<IMessageBusPublisher>()
-               .InstancePerLifetimeScope()
-               .WithParameter("endpoint", eventsEndpoint);
-
-            _builder
-               .RegisterType<MatchingEngine>()
-               .As<IMatchingEngine>()
-               .InstancePerLifetimeScope();
-
-            _builder
-               .RegisterGeneric(typeof(InMemoryRepository<>))
-               .As(typeof(IRepository<>))
-               .InstancePerLifetimeScope();
-            
-            _builder
-                .Build()
+            IocConfig
+                .CreateDefaultContainer(commandsEndpoint, eventsEndpoint)
                 .Resolve<IApplication>()
                 .Run();
 

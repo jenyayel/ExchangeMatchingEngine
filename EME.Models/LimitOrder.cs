@@ -12,11 +12,11 @@ namespace EME.Models
     /// </summary>
     public class LimitOrder : Order
     {
-        public decimal Price { get; private set; }
+        public double Price { get; private set; }
 
         public int PartitionKey { get; private set; }
 
-        public LimitOrder(OrderType orderType, string symbol, int shares, decimal price)
+        public LimitOrder(OrderType orderType, string symbol, int shares, double price)
             : base(orderType, symbol, shares)
         {
             if (price <= 0) throw new ArgumentOutOfRangeException("price");

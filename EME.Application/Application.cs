@@ -2,6 +2,8 @@
 using NetMQ;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -24,6 +26,8 @@ namespace EME.Application
             m_scope = scope;
             m_componentContext = componentContext;
             m_commandsEndpoint = endpoint;
+
+            Trace.WriteLine("Application starting...");
         }
 
         public void Run()
@@ -37,13 +41,16 @@ namespace EME.Application
             {
                 using (var _scope = m_scope.BeginLifetimeScope())
                 {
+                    Trace.WriteLine("Starting commands socket...");
                     var _mqContext = m_componentContext.Resolve<NetMQContext>();
                     var _socket = _mqContext.CreateResponseSocket();
                     _socket.Bind(m_commandsEndpoint);
 
+                    Trace.WriteLine("Commands socket started at: " + m_commandsEndpoint);
+
                     while (true)
                     {
-                        Console.WriteLine("Got message: " + _socket.ReceiveString());
+                        Trace.WriteLine("Got message: " + _socket.ReceiveString());
                         Thread.Sleep(100);
                     }
                 }

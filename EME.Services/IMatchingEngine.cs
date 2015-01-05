@@ -9,6 +9,6 @@ namespace EME.Services
 {
     public interface IMatchingEngine
     {
-        void ProcessOrder(OrderType orderType, string symbol, int shares, decimal? price);
+        void ProcessOrder(OrderType orderType, string symbol, int shares, double? price);
     }
 }

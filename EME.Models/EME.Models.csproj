@@ -39,10 +39,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\OrderCommand.cs" />
+    <Compile Include="Events\FilledEvent.cs" />
+    <Compile Include="Events\MarketOrderPlacedEvent.cs" />
+    <Compile Include="Events\OrderPlacedEvent.cs" />
+    <Compile Include="Events\PartialFilledEvent.cs" />
     <Compile Include="LimitOrder.cs" />
+    <Compile Include="Events\LimitOrderPlacedEvent.cs" />
     <Compile Include="LimitOrdersBook.cs" />
     <Compile Include="MarketOrder.cs" />
     <Compile Include="Order.cs" />
+    <Compile Include="Commands\PlaceLimitOrderCommand.cs" />
+    <Compile Include="Commands\PlaceMarketOrderCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -35,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="NetMQ">
+      <HintPath>..\packages\NetMQ.3.3.0.11\lib\net40\NetMQ.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <Choose>
@@ -50,14 +56,30 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Application\AcceptanceTests.cs" />
     <Compile Include="Models\LimitOrdersBookTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EME.Application\EME.Application.csproj">
+      <Project>{cedcd848-c7dd-44b3-be89-81dddcd7661c}</Project>
+      <Name>EME.Application</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\EME.Infrastructure\EME.Infrastructure.csproj">
+      <Project>{6210dbd8-f4a9-4281-a1f6-69bc34948f27}</Project>
+      <Name>EME.Infrastructure</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EME.Models\EME.Models.csproj">
       <Project>{b5b29705-6f1c-4114-9fe1-2c1dd63572de}</Project>
       <Name>EME.Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\EME.Services\EME.Services.csproj">
+      <Project>{21d9d17e-d9c6-4c12-9c9e-f08bd06148c8}</Project>
+      <Name>EME.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

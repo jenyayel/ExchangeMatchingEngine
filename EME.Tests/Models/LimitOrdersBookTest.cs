@@ -28,11 +28,11 @@ namespace EME.Tests.Models
                     OrderType.Buy,
                     "GOOG",
                     10,
-                    (decimal)(m_random.NextDouble() * (100 - 0.5) + 0.5)));
+                    m_random.NextDouble() * (100 - 0.5) + 0.5));
 
             // add a few with same price
-            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, (decimal)0.4));
-            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, (decimal)0.4));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 0.4));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 0.4));
             _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 50));
             _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 50));
             _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 101));
@@ -67,11 +67,11 @@ namespace EME.Tests.Models
                     OrderType.Sell,
                     "MSFT",
                     10,
-                    (decimal)(m_random.NextDouble() * (50 - 0.9) + 0.9)));
+                    m_random.NextDouble() * (50 - 0.9) + 0.9));
 
             // add a few with same price
-            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, (decimal)0.5));
-            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, (decimal)0.5));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 0.5));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 0.5));
             _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 25));
             _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 25));
             _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 51));
