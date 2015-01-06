@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using EME.Application.Commands;
 using EME.Models;
 using NetMQ.zmq;
+using System.Diagnostics;
 
 namespace EME.Application.ActorFramework
 {
@@ -30,13 +31,15 @@ namespace EME.Application.ActorFramework
             m_engine = engine;
         }
 
-
         public void Run(PairSocket shim, CancellationToken token)
         {
             while (!token.IsCancellationRequested)
             {
-                var _payload = shim.ReceiveString().FromJSON<OrderCommand>();
+                var _plainPayload = shim.ReceiveString();
+                var _payload = _plainPayload.FromJSON<OrderCommand>();
 
+                Trace.WriteLine("Processing command at shim: " + _plainPayload);
+                
                 m_engine.ProcessOrder(
                     _payload.Type == 0 ? OrderType.Buy : OrderType.Sell,
                     _payload.Symbol,

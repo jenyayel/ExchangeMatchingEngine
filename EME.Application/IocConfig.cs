@@ -38,13 +38,11 @@ namespace EME.Application
 
             _builder
                .RegisterType<MatchingEngine>()
-               .As<IMatchingEngine>()
-               .InstancePerLifetimeScope();
+               .As<IMatchingEngine>();
 
             _builder
                .RegisterType<EngineShimHandler>()
-               .As<IShimHandler>()
-               .InstancePerLifetimeScope();
+               .As<IShimHandler>();
 
             _builder
                .RegisterGeneric(typeof(InMemoryRepository<>))

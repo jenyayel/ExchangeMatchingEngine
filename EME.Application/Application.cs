@@ -13,6 +13,7 @@ using EME.Application.Commands;
 using NetMQ.Sockets;
 using EME.Models;
 using EME.Application.ActorFramework;
+using EME.Services;
 
 namespace EME.Application
 {
@@ -25,9 +26,10 @@ namespace EME.Application
         private readonly NetMQContext c_mqContext;
 
         private Poller m_commandsPoller;
-        private ResponseSocket m_commandsSocket;
+        private PullSocket m_commandsSocket;
+        private CancellationTokenSource m_cancelToken = new CancellationTokenSource();
 
-        private List<Actor> m_actors = new List<Actor>();
+        private List<Actor> m_actors;
 
         public Application(ILifetimeScope scope, IComponentContext componentContext, NetMQContext mqContext, string endpoint)
         {
@@ -44,19 +46,20 @@ namespace EME.Application
             Trace.WriteLine("Application starting...");
         }
 
-        public Task Run()
+        public void Run()
         {
             Trace.WriteLine("Application starting...");
             createActors();
 
-            return Task.WhenAll(
-                Task.Factory.StartNew(() => { startCommandsSocket(); }));
+            Task.Factory.StartNew(() => { startCommandsSocket(); }, m_cancelToken.Token);
         }
 
         public void Stop()
         {
             if (m_commandsPoller != null) m_commandsPoller.Stop(true);
             if (m_commandsSocket != null) m_commandsSocket.Close();
+
+            m_cancelToken.Cancel();
 
             foreach (var _actor in m_actors)
                 _actor.Dispose();
@@ -68,7 +71,7 @@ namespace EME.Application
             {
                 Trace.WriteLine("Starting commands socket...");
 
-                m_commandsSocket = c_mqContext.CreateResponseSocket();
+                m_commandsSocket = c_mqContext.CreatePullSocket();
                 m_commandsSocket.Bind(c_commandsEndpoint);
 
                 Trace.WriteLine("Commands socket started at: " + c_commandsEndpoint);
@@ -84,11 +87,16 @@ namespace EME.Application
                     var _commandType = _message[0].ConvertToString();
                     if (_commandType == OrderCommand.LIMIT_ORDER || _commandType == OrderCommand.MARKET_ORDER)
                     {
-                        var _payload = _message[1].ConvertToString().FromJSON<OrderCommand>();
-                        var _partition = _payload.Symbol.GetHashCode() % c_enginesCount;
+                        var _plainPayload = _message[1].ConvertToString();
+                        Trace.WriteLine("Received command: " + _plainPayload);
+
+                        var _payload = _plainPayload.FromJSON<OrderCommand>();
+                        var _selectedActor = _payload.Symbol.GetHashCode() % c_enginesCount;
+
+                        Trace.WriteLine("Selected actor: " + _selectedActor);
 
                         // send message to selected actor
-                        m_actors[_partition].Send(_message[1].ConvertToString());
+                        m_actors[_selectedActor].Send(_plainPayload);
                     }
                     else
                         throw NetMQException.Create("Unexpected command", NetMQ.zmq.ErrorCode.EFAULT);
@@ -100,13 +108,13 @@ namespace EME.Application
 
         private void createActors()
         {
+            m_actors = new List<Actor>();
+            Trace.WriteLine("Creating " + c_enginesCount + "...");
+
             for (int i = 0; i < c_enginesCount; i++)
             {
-                using(var _scope = c_scope.BeginLifetimeScope())
-                {
-                    var _handler = c_componentContext.Resolve<IShimHandler>();
-                    m_actors.Add(new Actor(c_mqContext, _handler));
-                }
+                var _handler = c_componentContext.Resolve<IShimHandler>();
+                m_actors.Add(new Actor(c_mqContext, _handler));
             }
         }
 

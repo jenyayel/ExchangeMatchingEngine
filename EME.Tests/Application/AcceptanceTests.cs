@@ -20,13 +20,38 @@ namespace EME.Tests.Application
         [TestMethod]
         public void FinalAcceptanceTest()
         {
+            //var _container = IocConfig
+            //  .CreateDefaultContainer(commandsEndpoint, eventsEndpoint);
+
+            //var _application = _container.Resolve<IApplication>();
+            //_application.Run();
+
+            //using (var _client = _container.Resolve<NetMQContext>().CreateRequestSocket())
+            //{
+            //    _client.Connect(commandsEndpoint);
+            //    _client.SendMore(OrderCommand.LIMIT_ORDER);
+            //    _client.Send(new OrderCommand
+            //    {
+            //        Type = 0,
+            //        Shares = 10,
+            //        Symbol = "MSFT",
+            //        Price = 50
+            //    }.ToJSON());
+            //}
+
+            //_application.Stop();
+        }
+
+        [TestMethod]
+        public void RoutingBySymbolTest()
+        {
             var _container = IocConfig
               .CreateDefaultContainer(commandsEndpoint, eventsEndpoint);
 
             var _application = _container.Resolve<IApplication>();
             _application.Run();
 
-            using (var _client = _container.Resolve<NetMQContext>().CreateRequestSocket())
+            using (var _client = _container.Resolve<NetMQContext>().CreatePushSocket())
             {
                 _client.Connect(commandsEndpoint);
                 _client.SendMore(OrderCommand.LIMIT_ORDER);
@@ -37,8 +62,17 @@ namespace EME.Tests.Application
                     Symbol = "MSFT",
                     Price = 50
                 }.ToJSON());
+                
+                _client.SendMore(OrderCommand.LIMIT_ORDER);
+                _client.Send(new OrderCommand
+                {
+                    Type = 0,
+                    Shares = 10,
+                    Symbol = "GOOG",
+                    Price = 50
+                }.ToJSON());
             }
-
+            Thread.Sleep(100000);
             _application.Stop();
         }
 
