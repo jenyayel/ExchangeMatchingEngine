@@ -38,33 +38,7 @@ namespace EME.Infrastructure.Messaging
 
         public void Dispose()
         {
-            this.Dispose(true);
-        }
-
-        /// <summary>
-        /// Releases resources. 
-        /// </summary>
-        /// <param name="disposing"><c>true</c> instructs garbage collector not call the finalizer of the object.; <c>false</c> only release resources.</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (m_socket == null)
-                return;
-
-            m_socket.Dispose();
-            m_context.Dispose();
-            // Suppress finalization of this disposed instance
-            if (disposing)
-                GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Finalizes an instance of the <see cref="NetMQPublisher" /> class.
-        /// Disposable types implement a finalizer. Handle cases when Dispose method was not invoked from calling method. 
-        /// <see cref="http://msdn.microsoft.com/en-us/library/ms182269.aspx"/>
-        /// </summary>
-        ~NetMQPublisher()
-        {
-            this.Dispose(false);
+            if (m_socket != null) m_socket.Close();            
         }
     }
 }

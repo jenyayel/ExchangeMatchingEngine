@@ -8,6 +8,8 @@ namespace EME.Application
 {
     public interface IApplication
     {
-        void Run();
+        Task Run();
+
+        void Stop();
     }
 }

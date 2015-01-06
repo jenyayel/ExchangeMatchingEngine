@@ -57,6 +57,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Application\AcceptanceTests.cs" />
+    <Compile Include="Application\ActorTests.cs" />
     <Compile Include="Models\LimitOrdersBookTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

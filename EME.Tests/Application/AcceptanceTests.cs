@@ -6,47 +6,41 @@ using NetMQ.Sockets;
 using Autofac;
 using EME.Infrastructure.Serialization;
 using EME.Application.Commands;
+using System.Threading;
 
 namespace EME.Tests.Application
 {
     [TestClass]
-    public class AcceptanceTests : IDisposable
+    public class AcceptanceTests
     {
         private const string commandsEndpoint = "tcp://localhost:8881";
         private const string eventsEndpoint = "tcp://:8882";
 
-        private NetMQContext m_context;
-        private NetMQSocket m_client;
-
-        [TestInitialize]
-        public void Init()
-        {
-            IocConfig
-               .CreateDefaultContainer(commandsEndpoint, eventsEndpoint)
-               .Resolve<IApplication>()
-               .Run();
-
-            m_context = NetMQContext.Create();
-            m_client = m_context.CreateRequestSocket();
-            m_client.Connect(commandsEndpoint);
-        }
 
         [TestMethod]
         public void FinalAcceptanceTest()
         {
-            m_client.Send(new PlaceLimitOrderCommand
+            var _container = IocConfig
+              .CreateDefaultContainer(commandsEndpoint, eventsEndpoint);
+
+            var _application = _container.Resolve<IApplication>();
+            _application.Run();
+
+            using (var _client = _container.Resolve<NetMQContext>().CreateRequestSocket())
             {
-                Type = 0,
-                Shares = 10,
-                Symbol = "MSFT",
-                Price = 50
-            }.ToJSONMessage());
+                _client.Connect(commandsEndpoint);
+                _client.SendMore(OrderCommand.LIMIT_ORDER);
+                _client.Send(new OrderCommand
+                {
+                    Type = 0,
+                    Shares = 10,
+                    Symbol = "MSFT",
+                    Price = 50
+                }.ToJSON());
+            }
+
+            _application.Stop();
         }
 
-        public void Dispose()
-        {
-            if (m_client != null) m_client.Dispose();
-            if (m_context != null) m_context.Dispose();
-        }
     }
 }

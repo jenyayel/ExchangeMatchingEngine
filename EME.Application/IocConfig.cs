@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using EME.Application.ActorFramework;
 using EME.Infrastructure.Messaging;
 using EME.Infrastructure.Persistance;
 using EME.Services;
@@ -38,6 +39,11 @@ namespace EME.Application
             _builder
                .RegisterType<MatchingEngine>()
                .As<IMatchingEngine>()
+               .InstancePerLifetimeScope();
+
+            _builder
+               .RegisterType<EngineShimHandler>()
+               .As<IShimHandler>()
                .InstancePerLifetimeScope();
 
             _builder

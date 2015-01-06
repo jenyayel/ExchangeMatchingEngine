@@ -29,11 +29,5 @@ namespace EME.Infrastructure.Serialization
         {
             return JsonConvert.SerializeObject(objectToSerialize);
         }
-
-        public static string ToJSONMessage(this object objectToSerialize)
-        {
-            return objectToSerialize.GetType().Name + ":" +
-                objectToSerialize.ToJSON();
-        }
     }
 }

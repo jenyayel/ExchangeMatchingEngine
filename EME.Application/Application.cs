@@ -10,34 +10,56 @@ using System.Threading;
 using System.Threading.Tasks;
 using EME.Infrastructure.Serialization;
 using EME.Application.Commands;
+using NetMQ.Sockets;
+using EME.Models;
+using EME.Application.ActorFramework;
 
 namespace EME.Application
 {
-    public class Application : IApplication
+    public class Application : IApplication, IDisposable
     {
-        private const string c_inprocAddress = "inproc://bus"; 
-
+        private readonly int c_enginesCount = Environment.ProcessorCount;
         private readonly string c_commandsEndpoint;
         private readonly ILifetimeScope c_scope;
         private readonly IComponentContext c_componentContext;
+        private readonly NetMQContext c_mqContext;
 
-        public Application(ILifetimeScope scope, IComponentContext componentContext, string endpoint)
+        private Poller m_commandsPoller;
+        private ResponseSocket m_commandsSocket;
+
+        private List<Actor> m_actors = new List<Actor>();
+
+        public Application(ILifetimeScope scope, IComponentContext componentContext, NetMQContext mqContext, string endpoint)
         {
             if (scope == null) throw new ArgumentNullException("scope");
             if (componentContext == null) throw new ArgumentNullException("componentContext");
+            if (mqContext == null) throw new ArgumentNullException("mqContext");
             if (String.IsNullOrEmpty(endpoint)) throw new ArgumentNullException("endpoint");
 
             c_scope = scope;
             c_componentContext = componentContext;
+            c_mqContext = mqContext;
             c_commandsEndpoint = endpoint;
 
             Trace.WriteLine("Application starting...");
         }
 
-        public void Run()
+        public Task Run()
         {
-            Task.WaitAll(
+            Trace.WriteLine("Application starting...");
+            createActors();
+
+            return Task.WhenAll(
                 Task.Factory.StartNew(() => { startCommandsSocket(); }));
+        }
+
+        public void Stop()
+        {
+            if (m_commandsPoller != null) m_commandsPoller.Stop(true);
+            if (m_commandsSocket != null) m_commandsSocket.Close();
+
+            foreach (var _actor in m_actors)
+                _actor.Dispose();
         }
 
         private void startCommandsSocket()
@@ -45,46 +67,52 @@ namespace EME.Application
             using (var _scope = c_scope.BeginLifetimeScope())
             {
                 Trace.WriteLine("Starting commands socket...");
-                var _mqContext = c_componentContext.Resolve<NetMQContext>();
-                var _socket = _mqContext.CreateResponseSocket();
-                _socket.Bind(c_commandsEndpoint);
+
+                m_commandsSocket = c_mqContext.CreateResponseSocket();
+                m_commandsSocket.Bind(c_commandsEndpoint);
 
                 Trace.WriteLine("Commands socket started at: " + c_commandsEndpoint);
 
-                while (true)
+                m_commandsPoller = new Poller();
+                m_commandsPoller.AddSocket(m_commandsSocket);
+
+                m_commandsSocket.ReceiveReady += (object sender, NetMQSocketEventArgs e) =>
                 {
-                    var _message = _socket.ReceiveString();
-                    Trace.WriteLine("Command: " + _message);
+                    NetMQMessage _message = m_commandsSocket.ReceiveMessage();
+                    if (_message == null) return;
 
-                    // TODO: find a better way to parse message types
-                    var _separatorIndex = _message.IndexOf(":");
-                    if (_separatorIndex != -1)
+                    var _commandType = _message[0].ConvertToString();
+                    if (_commandType == OrderCommand.LIMIT_ORDER || _commandType == OrderCommand.MARKET_ORDER)
                     {
-                        var _type = _message.Substring(0, _separatorIndex);
-                        var _object = _message.Substring(_separatorIndex + 1);
+                        var _payload = _message[1].ConvertToString().FromJSON<OrderCommand>();
+                        var _partition = _payload.Symbol.GetHashCode() % c_enginesCount;
 
-                        if (_type == typeof(PlaceLimitOrderCommand).Name)
-                        {
-                            var _order = _object.FromJSON<PlaceLimitOrderCommand>();
-                        }
-                        else if (_type == typeof(PlaceMarketOrderCommand).Name)
-                        {
-                            var _order = _object.FromJSON<PlaceMarketOrderCommand>();
-                        }
-                        else
-                            throw new InvalidOperationException("Type " + _type + " not supported");
-
-                        Trace.WriteLine("Type: " + _type);
-                        Trace.WriteLine("Object: " + _object);
+                        // send message to selected actor
+                        m_actors[_partition].Send(_message[1].ConvertToString());
                     }
-                    Thread.Sleep(100);
+                    else
+                        throw NetMQException.Create("Unexpected command", NetMQ.zmq.ErrorCode.EFAULT);
+                };
+
+                m_commandsPoller.Start();
+            }
+        }
+
+        private void createActors()
+        {
+            for (int i = 0; i < c_enginesCount; i++)
+            {
+                using(var _scope = c_scope.BeginLifetimeScope())
+                {
+                    var _handler = c_componentContext.Resolve<IShimHandler>();
+                    m_actors.Add(new Actor(c_mqContext, _handler));
                 }
             }
         }
 
-        private void startProcessors()
+        public void Dispose()
         {
-
+            this.Stop();
         }
     }
 }
