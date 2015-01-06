@@ -19,15 +19,9 @@ namespace EME.Application.ActorFramework
     {
         IMatchingEngine m_engine;
 
-        public EngineShimHandler(
-            //int partitionIndex,
-            //int partitionsCount,
-            IMatchingEngine engine)
+        public EngineShimHandler(IMatchingEngine engine)
         {
-            //if (partitionsCount < 1) throw new ArgumentOutOfRangeException("partitionsCount");
-            //if (partitionIndex < 0 || partitionIndex > partitionsCount - 1) throw new ArgumentOutOfRangeException("partitionIndex");
             if (engine == null) throw new ArgumentNullException("engine");
-
             m_engine = engine;
         }
 

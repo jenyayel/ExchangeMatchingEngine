@@ -57,9 +57,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Application\AcceptanceTests.cs" />
-    <Compile Include="Application\ActorTests.cs" />
     <Compile Include="Models\LimitOrdersBookTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\EngineTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EME.Application\EME.Application.csproj">

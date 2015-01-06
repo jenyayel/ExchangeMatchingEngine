@@ -17,30 +17,30 @@ namespace EME.Tests.Application
         private const string eventsEndpoint = "tcp://:8882";
 
 
-        [TestMethod]
-        public void FinalAcceptanceTest()
-        {
-            //var _container = IocConfig
-            //  .CreateDefaultContainer(commandsEndpoint, eventsEndpoint);
+        //[TestMethod]
+        //public void FinalAcceptanceTest()
+        //{
+        //    var _container = IocConfig
+        //      .CreateDefaultContainer(commandsEndpoint, eventsEndpoint);
 
-            //var _application = _container.Resolve<IApplication>();
-            //_application.Run();
+        //    var _application = _container.Resolve<IApplication>();
+        //    _application.Run();
 
-            //using (var _client = _container.Resolve<NetMQContext>().CreateRequestSocket())
-            //{
-            //    _client.Connect(commandsEndpoint);
-            //    _client.SendMore(OrderCommand.LIMIT_ORDER);
-            //    _client.Send(new OrderCommand
-            //    {
-            //        Type = 0,
-            //        Shares = 10,
-            //        Symbol = "MSFT",
-            //        Price = 50
-            //    }.ToJSON());
-            //}
+        //    using (var _client = _container.Resolve<NetMQContext>().CreateRequestSocket())
+        //    {
+        //        _client.Connect(commandsEndpoint);
+        //        _client.SendMore(OrderCommand.LIMIT_ORDER);
+        //        _client.Send(new OrderCommand
+        //        {
+        //            Type = 0,
+        //            Shares = 10,
+        //            Symbol = "MSFT",
+        //            Price = 50
+        //        }.ToJSON());
+        //    }
 
-            //_application.Stop();
-        }
+        //    _application.Stop();
+        //}
 
         [TestMethod]
         public void RoutingBySymbolTest()
@@ -72,8 +72,9 @@ namespace EME.Tests.Application
                     Price = 50
                 }.ToJSON());
             }
-            Thread.Sleep(100000);
+            Thread.Sleep(1000);
             _application.Stop();
+            Assert.IsTrue(true);
         }
 
     }

@@ -25,7 +25,6 @@ namespace EME.Application
         private readonly IComponentContext c_componentContext;
         private readonly NetMQContext c_mqContext;
 
-        private Poller m_commandsPoller;
         private PullSocket m_commandsSocket;
         private CancellationTokenSource m_cancelToken = new CancellationTokenSource();
 
@@ -51,14 +50,16 @@ namespace EME.Application
             Trace.WriteLine("Application starting...");
             createActors();
 
-            Task.Factory.StartNew(() => { startCommandsSocket(); }, m_cancelToken.Token);
+            Task.Factory.StartNew(
+                () => startCommandsSocket(), 
+                m_cancelToken.Token,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default);
         }
 
         public void Stop()
         {
-            if (m_commandsPoller != null) m_commandsPoller.Stop(true);
             if (m_commandsSocket != null) m_commandsSocket.Close();
-
             m_cancelToken.Cancel();
 
             foreach (var _actor in m_actors)
@@ -76,10 +77,7 @@ namespace EME.Application
 
                 Trace.WriteLine("Commands socket started at: " + c_commandsEndpoint);
 
-                m_commandsPoller = new Poller();
-                m_commandsPoller.AddSocket(m_commandsSocket);
-
-                m_commandsSocket.ReceiveReady += (object sender, NetMQSocketEventArgs e) =>
+                while (!m_cancelToken.IsCancellationRequested)
                 {
                     NetMQMessage _message = m_commandsSocket.ReceiveMessage();
                     if (_message == null) return;
@@ -100,9 +98,7 @@ namespace EME.Application
                     }
                     else
                         throw NetMQException.Create("Unexpected command", NetMQ.zmq.ErrorCode.EFAULT);
-                };
-
-                m_commandsPoller.Start();
+                }
             }
         }
 
