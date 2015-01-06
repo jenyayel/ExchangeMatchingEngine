@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EME.Models.Commands
+namespace EME.Application.Commands
 {
     public abstract class OrderCommand
     {

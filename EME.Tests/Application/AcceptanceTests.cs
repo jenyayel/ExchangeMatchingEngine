@@ -5,7 +5,7 @@ using NetMQ;
 using NetMQ.Sockets;
 using Autofac;
 using EME.Infrastructure.Serialization;
-using EME.Models.Commands;
+using EME.Application.Commands;
 
 namespace EME.Tests.Application
 {

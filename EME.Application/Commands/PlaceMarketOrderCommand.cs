@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EME.Models.Commands
+namespace EME.Application.Commands
 {
-    public class PlaceLimitOrderCommand : OrderCommand
+    public class PlaceMarketOrderCommand : OrderCommand
     {
-        public double Price { get; set; }
     }
 }

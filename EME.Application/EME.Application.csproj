@@ -48,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application.cs" />
+    <Compile Include="Commands\OrderCommand.cs" />
+    <Compile Include="Commands\PlaceLimitOrderCommand.cs" />
+    <Compile Include="Commands\PlaceMarketOrderCommand.cs" />
     <Compile Include="IApplication.cs" />
     <Compile Include="IocConfig.cs" />
     <Compile Include="Program.cs" />
