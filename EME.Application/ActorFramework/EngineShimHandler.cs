@@ -39,8 +39,6 @@ namespace EME.Application.ActorFramework
                     _payload.Symbol,
                     _payload.Shares,
                     _payload.Price);
-
-                //shim.Send(account.ToJSON());
             }
         }
     }

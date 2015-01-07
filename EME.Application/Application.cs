@@ -30,6 +30,7 @@ namespace EME.Application
 
         private PullSocket m_commandsSocket;
         private PullSocket m_internalEventsSocket;
+        private PublisherSocket m_eventsSocket;
 
         private CancellationTokenSource m_cancelToken = new CancellationTokenSource();
 
@@ -83,8 +84,6 @@ namespace EME.Application
 
         private void startCommandsSocket()
         {
-            Trace.WriteLine("Starting commands socket...");
-
             m_commandsSocket = c_mqContext.CreatePullSocket();
             m_commandsSocket.Bind(c_commandsEndpoint);
 
@@ -122,34 +121,40 @@ namespace EME.Application
 
         private void startEventsSocket()
         {
-            Trace.WriteLine("Starting events socket...");
-            m_commandsSocket = c_mqContext.CreatePullSocket();
-            m_commandsSocket.Bind(c_internalEventsEndpoint);
+            m_internalEventsSocket = c_mqContext.CreatePullSocket();
+            m_internalEventsSocket.Bind(c_internalEventsEndpoint);
+
+            m_eventsSocket = c_mqContext.CreatePublisherSocket();
+            m_eventsSocket.Bind(c_eventsEndpoint);
+
+            Trace.WriteLine("Events socket started at: " + c_eventsEndpoint);
                         
             while (!m_cancelToken.IsCancellationRequested)
             {
-                NetMQMessage _message = m_commandsSocket.ReceiveMessage();
+                NetMQMessage _message = m_internalEventsSocket.ReceiveMessage();
                 if (_message == null) continue;
 
                 var _eventType = _message[0].ConvertToString();
                 var _eventPayload = _message[1].ConvertToString();
 
                 //TODO: send event outside
-                Trace.WriteLine("Received internal event " + _eventType);
-                
+                Trace.WriteLine("Publishing event: [" + _eventType + "] " + _eventPayload);
+
+                m_eventsSocket.SendMessage(_message);
             }
         }
 
         private void createActors()
         {
             m_actors = new List<Actor>();
-            Trace.WriteLine("Creating " + c_enginesCount + "...");
 
             for (int i = 0; i < c_enginesCount; i++)
             {
                 var _handler = c_componentContext.Resolve<IShimHandler>();
                 m_actors.Add(new Actor(c_mqContext, _handler));
             }
+
+            Trace.WriteLine("Created " + c_enginesCount + " actors");
         }
 
         public void Dispose()
@@ -168,6 +173,7 @@ namespace EME.Application
             if (m_commandsSocket != null) m_commandsSocket.Close();
             foreach (var _actor in m_actors) _actor.Dispose();
             if (m_internalEventsSocket != null) m_internalEventsSocket.Dispose();
+            if (m_eventsSocket != null) m_eventsSocket.Dispose();
 
             // Suppress finalization of this disposed instance
             if (disposing)
