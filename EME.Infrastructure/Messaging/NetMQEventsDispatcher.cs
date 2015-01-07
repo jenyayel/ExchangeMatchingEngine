@@ -2,31 +2,36 @@
 using NetMQ.Sockets;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EME.Infrastructure.Messaging
 {
-    public class NetMQSubscriber : IMessageBusSubscriber, IDisposable
+    public class NetMQEventsDispatcher : IEventsDispatcher, IDisposable
     {
         private NetMQContext m_context;
-        private SubscriberSocket m_socket;
+        private PushSocket m_socket;
 
-        public NetMQSubscriber(NetMQContext context, string endpoint, params string[] topics)
+        public NetMQEventsDispatcher(NetMQContext context, string endpoint)
         {
             if (context == null) throw new ArgumentNullException("context");
             if (String.IsNullOrEmpty(endpoint)) throw new ArgumentNullException("endpoint");
 
             m_context = context;
-            m_socket = m_context.CreateSubscriberSocket();
-            m_socket.Bind(endpoint);
+            m_socket = m_context.CreatePushSocket();
 
-            if (topics == null || topics.Length == 0)
-                m_socket.Subscribe(String.Empty);
-            else
-                foreach (var topic in topics)
-                    m_socket.Subscribe(topic);
+            m_socket.Connect(endpoint);
+        }
+
+        public void Send(string type, string message)
+        {
+            if (String.IsNullOrEmpty(type)) throw new ArgumentNullException("type");
+            if (String.IsNullOrEmpty(message)) throw new ArgumentNullException("message");
+
+            m_socket.SendMore(type);
+            m_socket.Send(message);
         }
 
         public void Dispose()
@@ -44,18 +49,17 @@ namespace EME.Infrastructure.Messaging
                 return;
 
             m_socket.Dispose();
-            m_context.Dispose();
             // Suppress finalization of this disposed instance
             if (disposing)
                 GC.SuppressFinalize(this);
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="NetMQPublisher" /> class.
+        /// Finalizes an instance of the <see cref="NetMQEventsDispatcher" /> class.
         /// Disposable types implement a finalizer. Handle cases when Dispose method was not invoked from calling method. 
         /// <see cref="http://msdn.microsoft.com/en-us/library/ms182269.aspx"/>
         /// </summary>
-        ~NetMQSubscriber()
+        ~NetMQEventsDispatcher()
         {
             this.Dispose(false);
         }

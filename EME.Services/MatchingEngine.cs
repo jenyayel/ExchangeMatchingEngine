@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using EME.Infrastructure.Extensions;
+using EME.Infrastructure.Serialization;
 using EME.Models.Events;
 
 namespace EME.Services
@@ -16,12 +16,12 @@ namespace EME.Services
         private LimitOrdersBook m_ordersBook;
         private MarketOrdersQueue m_ordersQueue;
 
-        private IMessageBusPublisher m_publisher;
+        private IEventsDispatcher m_publisher;
         private IRepository<LimitOrder> m_limitOrdersRepository;
         private IRepository<MarketOrder> m_marketOrdersRepository;
 
         public MatchingEngine(
-            IMessageBusPublisher publisher,
+            IEventsDispatcher publisher,
             IRepository<LimitOrder> limitOrdersRepository,
             IRepository<MarketOrder> marketOrdersRepository)
         {
@@ -51,13 +51,15 @@ namespace EME.Services
                 m_limitOrdersRepository.Add(_order);
 
                 // fire event
-                m_publisher.Send(new LimitOrderPlacedEvent
-                {
-                    OrderId = _order.OrderId,
-                    Shares = _order.SharesCount,
-                    Symbol = _order.Symbol,
-                    Price = _order.Price
-                }.ToJSONMessage());
+                m_publisher.Send(
+                    typeof(LimitOrderPlacedEvent).Name,
+                    new LimitOrderPlacedEvent
+                    {
+                        OrderId = _order.OrderId,
+                        Shares = _order.SharesCount,
+                        Symbol = _order.Symbol,
+                        Price = _order.Price
+                    }.ToJSON());
             }
             else
             {
@@ -70,12 +72,14 @@ namespace EME.Services
                 m_marketOrdersRepository.Add(_order);
 
                 // fire event
-                m_publisher.Send(new MarketOrderPlacedEvent
-                {
-                    OrderId = _order.OrderId,
-                    Shares = _order.SharesCount,
-                    Symbol = _order.Symbol
-                }.ToJSONMessage());
+                m_publisher.Send(
+                    typeof(MarketOrderPlacedEvent).Name,
+                    new MarketOrderPlacedEvent
+                    {
+                        OrderId = _order.OrderId,
+                        Shares = _order.SharesCount,
+                        Symbol = _order.Symbol
+                    }.ToJSON());
             }
         }
     }

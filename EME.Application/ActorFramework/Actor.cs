@@ -18,7 +18,7 @@ namespace EME.Application.ActorFramework
     /// </summary>
     public class Actor : IOutgoingSocket, IReceivingSocket, IDisposable
     {
-        private const string c_inprocEndpointFormat = "inproc://zactor-{0}-{1}";
+        private const string c_inprocEndpointFormat = "inproc://actor-{0}-{1}";
 
         private readonly PairSocket m_pairSocket;
         private readonly Shim m_shim;

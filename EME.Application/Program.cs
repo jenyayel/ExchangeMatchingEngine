@@ -15,15 +15,13 @@ namespace EME.Application
 
             Trace.Listeners.Add(new ConsoleTraceListener());
 
-            var _app = IocConfig
+            using (var _app = IocConfig
                 .CreateDefaultContainer(commandsEndpoint, eventsEndpoint)
-                .Resolve<IApplication>();
-
-            _app.Run();
-
-            Console.ReadKey();
-
-            _app.Stop();
+                .Resolve<IApplication>())
+            {
+                _app.Run();
+                Console.ReadKey();
+            }
         }
     }
 }

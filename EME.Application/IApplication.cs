@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace EME.Application
 {
-    public interface IApplication
+    public interface IApplication : IDisposable
     {
         void Run();
-
-        void Stop();
     }
 }

@@ -48,33 +48,33 @@ namespace EME.Tests.Application
             var _container = IocConfig
               .CreateDefaultContainer(commandsEndpoint, eventsEndpoint);
 
-            var _application = _container.Resolve<IApplication>();
-            _application.Run();
-
-            using (var _client = _container.Resolve<NetMQContext>().CreatePushSocket())
+            using (var _application = _container.Resolve<IApplication>())
             {
-                _client.Connect(commandsEndpoint);
-                _client.SendMore(OrderCommand.LIMIT_ORDER);
-                _client.Send(new OrderCommand
+                _application.Run();
+
+                using (var _client = _container.Resolve<NetMQContext>().CreatePushSocket())
                 {
-                    Type = 0,
-                    Shares = 10,
-                    Symbol = "MSFT",
-                    Price = 50
-                }.ToJSON());
-                
-                _client.SendMore(OrderCommand.LIMIT_ORDER);
-                _client.Send(new OrderCommand
-                {
-                    Type = 0,
-                    Shares = 10,
-                    Symbol = "GOOG",
-                    Price = 50
-                }.ToJSON());
+                    _client.Connect(commandsEndpoint);
+                    _client.SendMore(OrderCommand.LIMIT_ORDER);
+                    _client.Send(new OrderCommand
+                    {
+                        Type = 0,
+                        Shares = 10,
+                        Symbol = "MSFT",
+                        Price = 50
+                    }.ToJSON());
+
+                    _client.SendMore(OrderCommand.LIMIT_ORDER);
+                    _client.Send(new OrderCommand
+                    {
+                        Type = 0,
+                        Shares = 10,
+                        Symbol = "GOOG",
+                        Price = 50
+                    }.ToJSON());
+                }
+                Thread.Sleep(1000);
             }
-            Thread.Sleep(1000);
-            _application.Stop();
-            Assert.IsTrue(true);
         }
 
     }

@@ -15,6 +15,8 @@ namespace EME.Application
 {
     public static class IocConfig
     {
+        private const string c_inprocEvetsEndpoint = "inproc://eventsbus";
+
         public static IContainer CreateDefaultContainer(string commandsEndpoint, string eventsEndpoint)
         {
             var _builder = new ContainerBuilder();
@@ -23,7 +25,9 @@ namespace EME.Application
                 .RegisterType<Application>()
                 .As<IApplication>()
                 .SingleInstance()
-                .WithParameter("endpoint", commandsEndpoint);
+                .WithParameter("commandsEndpoint", commandsEndpoint)
+                .WithParameter("eventsEndpoint", eventsEndpoint)
+                .WithParameter("internalEventsEndpoint", c_inprocEvetsEndpoint);
             
             _builder
                 .RegisterInstance(NetMQContext.Create())
@@ -31,10 +35,9 @@ namespace EME.Application
                 .SingleInstance();
 
             _builder
-               .RegisterType<NetMQPublisher>()
-               .As<IMessageBusPublisher>()
-               .InstancePerLifetimeScope()
-               .WithParameter("endpoint", eventsEndpoint);
+               .RegisterType<NetMQEventsDispatcher>()
+               .As<IEventsDispatcher>()
+               .WithParameter("endpoint", c_inprocEvetsEndpoint);
 
             _builder
                .RegisterType<MatchingEngine>()

@@ -45,12 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\JsonSerializer.cs" />
     <Compile Include="Serialization\JsonSerializer.cs" />
-    <Compile Include="Messaging\IMessageBusPublisher.cs" />
-    <Compile Include="Messaging\IMessageBusSubscriber.cs" />
-    <Compile Include="Messaging\NetMQPublisher.cs" />
-    <Compile Include="Messaging\NetMQSubscriber.cs" />
+    <Compile Include="Messaging\IEventsDispatcher.cs" />
+    <Compile Include="Messaging\NetMQEventsDispatcher.cs" />
     <Compile Include="Persistance\InMemoryRepository.cs" />
     <Compile Include="Persistance\IRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

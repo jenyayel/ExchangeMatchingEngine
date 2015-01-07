@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace EME.Infrastructure.Messaging
 {
-    public interface IMessageBusSubscriber
+    public interface IEventsDispatcher
     {
+        void Send(string type, string message);
     }
 }
