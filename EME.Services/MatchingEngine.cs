@@ -40,47 +40,67 @@ namespace EME.Services
 
         public void ProcessOrder(OrderType orderType, string symbol, int shares, double? price)
         {
+            Order _placedOrder;
             if (price.HasValue)
-            {
-                var _order = new LimitOrder(orderType, symbol, shares, price.Value);
-
-                // add to book
-                m_ordersBook.AddOrder(_order);
-
-                // persist
-                m_limitOrdersRepository.Add(_order);
-
-                // fire event
-                m_publisher.Send(
-                    typeof(LimitOrderPlacedEvent).Name,
-                    new LimitOrderPlacedEvent
-                    {
-                        OrderId = _order.OrderId,
-                        Shares = _order.SharesCount,
-                        Symbol = _order.Symbol,
-                        Price = _order.Price
-                    }.ToJSON());
-            }
+                _placedOrder = addLimitOrder(orderType, symbol, shares, price.Value);
             else
+                _placedOrder = addMarketOrder(orderType, symbol, shares);
+
+            while(shares > 0)
             {
-                var _order = new MarketOrder(orderType, symbol, shares);
+                var _matchedLimitOrder = m_ordersBook.FindMatch(
+                    orderType == OrderType.Buy ? OrderType.Sell : OrderType.Buy, symbol, price);
 
-                // add to queue
-                m_ordersQueue.AddOrder(_order);
-
-                // persist
-                m_marketOrdersRepository.Add(_order);
-
-                // fire event
-                m_publisher.Send(
-                    typeof(MarketOrderPlacedEvent).Name,
-                    new MarketOrderPlacedEvent
-                    {
-                        OrderId = _order.OrderId,
-                        Shares = _order.SharesCount,
-                        Symbol = _order.Symbol
-                    }.ToJSON());
+                // 
             }
         }
+
+        private LimitOrder addLimitOrder(OrderType orderType, string symbol, int shares, double price)
+        {
+            var _order = new LimitOrder(orderType, symbol, shares, price);
+
+            // add to book
+            m_ordersBook.AddOrder(_order);
+
+            // persist
+            m_limitOrdersRepository.Add(_order);
+
+            // fire event
+            m_publisher.Send(
+                typeof(LimitOrderPlacedEvent).Name,
+                new LimitOrderPlacedEvent
+                {
+                    OrderId = _order.OrderId,
+                    Shares = _order.SharesCount,
+                    Symbol = _order.Symbol,
+                    Price = _order.Price
+                }.ToJSON());
+
+            return _order;
+        }
+
+        private MarketOrder addMarketOrder(OrderType orderType, string symbol, int shares)
+        {
+            var _order = new MarketOrder(orderType, symbol, shares);
+
+            // add to queue
+            m_ordersQueue.AddOrder(_order);
+
+            // persist
+            m_marketOrdersRepository.Add(_order);
+
+            // fire event
+            m_publisher.Send(
+                typeof(MarketOrderPlacedEvent).Name,
+                new MarketOrderPlacedEvent
+                {
+                    OrderId = _order.OrderId,
+                    Shares = _order.SharesCount,
+                    Symbol = _order.Symbol
+                }.ToJSON());
+
+            return _order;
+        }
+
     }
 }

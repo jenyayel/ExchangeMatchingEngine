@@ -30,7 +30,10 @@ namespace EME.Models
             return String.Format("{0} {1}", base.ToString(), Price.ToString("C"));
         }
     }
-
+    
+    /// <summary>
+    /// Compare LimitOrders by their price
+    /// </summary>
     public class PriceComparer : IComparer<LimitOrder>
     {
         private bool m_isDescending;

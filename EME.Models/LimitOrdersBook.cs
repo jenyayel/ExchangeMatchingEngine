@@ -33,5 +33,23 @@ namespace EME.Models
             var _index = _list.BinarySearch(order, new PriceComparer(order.OrderType == OrderType.Buy));
             _list.Insert(_index < 0 ? ~_index : _index, order);
         }
+
+        public LimitOrder FindMatch(OrderType typeToSearch, string symbol, double? price = null)
+        {
+            if (String.IsNullOrEmpty(symbol)) throw new ArgumentNullException("symbol");
+
+            var _list = typeToSearch == OrderType.Buy ? m_buyOrders : m_sellOrders;
+
+            var _priceMatch = new Func<double, double, bool>((listPrice, askedPrice) =>
+            {
+                if (typeToSearch == OrderType.Buy)
+                    return listPrice >= askedPrice;
+                else
+                    return listPrice <= askedPrice;
+            });
+            
+            return _list.FirstOrDefault(o => o.Symbol == symbol &&
+                (!price.HasValue || _priceMatch(o.Price, price.Value)));
+        }
     }
 }

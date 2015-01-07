@@ -88,5 +88,115 @@ namespace EME.Tests.Models
 
             Assert.IsTrue(_expectedList.SequenceEqual(_actualList), "Sell list is not ordered");
         }
+        
+        [TestMethod]
+        public void FindBuyOrderWithPriceTest()
+        {
+            // --------------------------------
+            // Arrange
+            // --------------------------------
+            LimitOrdersBook _book = new LimitOrdersBook();
+
+            // --------------------------------
+            // Act
+            // --------------------------------
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 1));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "MSFT", 10, 5));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "MSFT", 10, 7.5));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 10));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "MSFT", 10, 20));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 30));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 40));
+
+            // --------------------------------
+            // Assert
+            // --------------------------------
+            Assert.AreEqual(40, _book.FindMatch(OrderType.Buy, "GOOG", 10).Price);
+            Assert.AreEqual(20, _book.FindMatch(OrderType.Buy, "MSFT", 8).Price);
+            Assert.AreEqual(20, _book.FindMatch(OrderType.Buy, "MSFT", 20).Price);
+            Assert.IsNull(_book.FindMatch(OrderType.Buy, "GOOG", 100), "Found price that much higher than any in list");
+        }
+
+        [TestMethod]
+        public void FindSellOrderWithPriceTest()
+        {
+            // --------------------------------
+            // Arrange
+            // --------------------------------
+            LimitOrdersBook _book = new LimitOrdersBook();
+
+            // --------------------------------
+            // Act
+            // --------------------------------
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "GOOG", 10, 1));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 5));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 7.5));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "GOOG", 10, 10));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 20));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "GOOG", 10, 30));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "GOOG", 10, 40));
+
+            // --------------------------------
+            // Assert
+            // --------------------------------
+            Assert.AreEqual(1, _book.FindMatch(OrderType.Sell, "GOOG", 10).Price);
+            Assert.AreEqual(5, _book.FindMatch(OrderType.Sell, "MSFT", 7.4).Price);
+            Assert.AreEqual(1, _book.FindMatch(OrderType.Sell, "GOOG", 40).Price);
+            Assert.IsNull(_book.FindMatch(OrderType.Sell, "GOOG", 0.5), "Found price that much higher than any in list");
+        }
+
+        [TestMethod]
+        public void FindBuyOrderWithNoPriceTest()
+        {
+            // --------------------------------
+            // Arrange
+            // --------------------------------
+            LimitOrdersBook _book = new LimitOrdersBook();
+
+            // --------------------------------
+            // Act
+            // --------------------------------
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 1));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "MSFT", 10, 5));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "MSFT", 10, 7.5));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 10));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "MSFT", 10, 20));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 30));
+            _book.AddOrder(new LimitOrder(OrderType.Buy, "GOOG", 10, 40));
+
+            // --------------------------------
+            // Assert
+            // --------------------------------
+            Assert.AreEqual(40, _book.FindMatch(OrderType.Buy, "GOOG").Price);
+            Assert.AreEqual(20, _book.FindMatch(OrderType.Buy, "MSFT").Price);
+            Assert.IsNull(_book.FindMatch(OrderType.Buy, "KUKU"));
+        }
+
+        [TestMethod]
+        public void FindSellOrderWithNoPriceTest()
+        {
+            // --------------------------------
+            // Arrange
+            // --------------------------------
+            LimitOrdersBook _book = new LimitOrdersBook();
+
+            // --------------------------------
+            // Act
+            // --------------------------------
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "GOOG", 10, 1));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 5));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 7.5));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "GOOG", 10, 10));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "MSFT", 10, 20));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "GOOG", 10, 30));
+            _book.AddOrder(new LimitOrder(OrderType.Sell, "GOOG", 10, 40));
+
+            // --------------------------------
+            // Assert
+            // --------------------------------
+            Assert.AreEqual(1, _book.FindMatch(OrderType.Sell, "GOOG").Price);
+            Assert.AreEqual(5, _book.FindMatch(OrderType.Sell, "MSFT").Price);
+            Assert.IsNull(_book.FindMatch(OrderType.Sell, "KUKU"));
+        }
     }
 }

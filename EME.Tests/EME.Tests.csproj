@@ -60,6 +60,7 @@
     <Compile Include="Models\LimitOrdersBookTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\EngineTests.cs" />
+    <Compile Include="Stubs\EventsDispatcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EME.Application\EME.Application.csproj">
