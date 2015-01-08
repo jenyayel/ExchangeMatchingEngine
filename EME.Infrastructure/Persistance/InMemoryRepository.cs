@@ -32,8 +32,15 @@ namespace EME.Infrastructure.Persistance
         {
             if (item == null) throw new ArgumentNullException("item");
 
-            if (!m_items.TryTake(out item))
-                throw new TimeoutException();
+            m_items.TryTake(out item);
+        }
+
+        public void Update(T item)
+        {
+            if (item == null) throw new ArgumentNullException("item");
+
+            // there is no reason to implement update, because the referenced item is already updated
+            // side note: trickier to implement in generics, T must be defined with BaseEntity
         }
     }
 }
