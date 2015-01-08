@@ -28,9 +28,9 @@ namespace EME.Application
         private readonly string c_eventsEndpoint;
         private readonly string c_internalEventsEndpoint;
 
-        private PullSocket m_commandsSocket;
-        private PullSocket m_internalEventsSocket;
-        private PushSocket m_eventsSocket;
+        private PullSocket m_commandsSocket; // for commands API
+        private PullSocket m_internalEventsSocket; // for inproc messaging (engines => application)
+        private PushSocket m_eventsSocket; // for events API
 
         private CancellationTokenSource m_cancelToken = new CancellationTokenSource();
 
@@ -97,6 +97,7 @@ namespace EME.Application
                 var _commandType = _message[0].ConvertToString();
                 if (_commandType == OrderCommand.LIMIT_ORDER || _commandType == OrderCommand.MARKET_ORDER)
                 {
+                    // command from API received
                     var _plainPayload = _message[1].ConvertToString();
                     Trace.WriteLine("Received command: " + _plainPayload);
 
@@ -131,13 +132,13 @@ namespace EME.Application
                         
             while (!m_cancelToken.IsCancellationRequested)
             {
+                // wait for inproc event and just forward to events API
                 NetMQMessage _message = m_internalEventsSocket.ReceiveMessage();
                 if (_message == null) continue;
 
                 var _eventType = _message[0].ConvertToString();
                 var _eventPayload = _message[1].ConvertToString();
 
-                //TODO: send event outside
                 Trace.WriteLine("Publishing event: [" + _eventType + "] " + _eventPayload);
 
                 m_eventsSocket.SendMessage(_message);

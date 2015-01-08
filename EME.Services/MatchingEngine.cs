@@ -39,7 +39,7 @@ namespace EME.Services
         }
 
         /// <summary>
-        /// Process all busness logic for newly placed order
+        /// Process all buseness logic for newly placed order
         /// </summary>
         /// <param name="orderType">The type of order that was just placed</param>
         /// <param name="symbol"></param>
@@ -146,6 +146,9 @@ namespace EME.Services
             return _handledShares;
         }
 
+        /// <summary>
+        /// Dispatches necessary events after order was proccessed
+        /// </summary>
         private void processedOrdersEvents(Order placedOrder, Order matchedOrder, int transferedShares, double price)
         {
             m_publisher.Send(

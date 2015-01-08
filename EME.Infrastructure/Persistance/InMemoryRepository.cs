@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 
 namespace EME.Infrastructure.Persistance
 {
+    /// <summary>
+    /// The most simple (and dumb) in-memory storage based on BlockingCollection.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class InMemoryRepository<T> : IRepository<T>
     {
         BlockingCollection<T> m_items;
