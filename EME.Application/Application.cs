@@ -30,7 +30,7 @@ namespace EME.Application
 
         private PullSocket m_commandsSocket;
         private PullSocket m_internalEventsSocket;
-        private PublisherSocket m_eventsSocket;
+        private PushSocket m_eventsSocket;
 
         private CancellationTokenSource m_cancelToken = new CancellationTokenSource();
 
@@ -124,7 +124,7 @@ namespace EME.Application
             m_internalEventsSocket = c_mqContext.CreatePullSocket();
             m_internalEventsSocket.Bind(c_internalEventsEndpoint);
 
-            m_eventsSocket = c_mqContext.CreatePublisherSocket();
+            m_eventsSocket = c_mqContext.CreatePushSocket();
             m_eventsSocket.Bind(c_eventsEndpoint);
 
             Trace.WriteLine("Events socket started at: " + c_eventsEndpoint);

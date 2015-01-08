@@ -15,7 +15,11 @@ namespace EME.Application.Commands
 
         public string Symbol { get; set; }
         public int Shares { get; set; }
-        public int Type { get; set; } // 0 for buy, 1 for sell
+        
+        /// <summary>
+        /// 0 for buy, 1 for sell
+        /// </summary>
+        public int Type { get; set; }
         public double? Price { get; set; }
     }
 }
