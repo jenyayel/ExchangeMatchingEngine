@@ -50,20 +50,22 @@ namespace EME.Services
             if (String.IsNullOrEmpty(symbol)) throw new ArgumentNullException("symbol");
             if (shares < 1) throw new ArgumentOutOfRangeException("shares");
 
+            // create, persist and fire event for newly received order
             Order _placedOrder;
             if (price.HasValue)
                 _placedOrder = addLimitOrder(orderType, symbol, shares, price.Value);
             else
                 _placedOrder = addMarketOrder(orderType, symbol, shares);
 
-            // look in limit orders book
+            // look for "oposite" matchings in limit orders book
             matchInOrderBook(_placedOrder, price);
 
             // look in market orders queue
-            //while (_placedOrder.CurrentSharesCount > 0)
-            //{
-
-            //}
+            // TODO: not clear whether market orders should be also checked in market orders queue,
+            // if so what will be the closed price?
+            // anyway, we assume that it is not supposed to happen
+            if (_placedOrder is LimitOrder)
+                matchInOrdersQueue((LimitOrder)_placedOrder);
 
         }
 
@@ -81,70 +83,103 @@ namespace EME.Services
                 if (_matchedLimitOrder == null) break;
 
                 // update shares number in both orders (requested and matched)
-                var _handledShares = 0;
-                if (_matchedLimitOrder.CurrentSharesCount >= placedOrder.CurrentSharesCount)
-                {
-                    _matchedLimitOrder.CurrentSharesCount -= placedOrder.CurrentSharesCount;
-                    _handledShares = placedOrder.CurrentSharesCount;
-                    placedOrder.CurrentSharesCount = 0;
-                }
-                else
-                {
-                    placedOrder.CurrentSharesCount -= _matchedLimitOrder.OriginalSharesCount;
-                    _handledShares = _matchedLimitOrder.OriginalSharesCount;
-                    _matchedLimitOrder.CurrentSharesCount = 0;
-                }
+                var _handledShares = transferOrdersShares(placedOrder, _matchedLimitOrder);
 
                 // persist matched order
-                // in case no "shares" remains in order we can remove it from order book
-                if (_matchedLimitOrder.CurrentSharesCount == 0)
-                {
-                    m_ordersBook.Remove(_matchedLimitOrder);
-                    m_limitOrdersRepository.Remove(_matchedLimitOrder);
-                }
-                else
-                    m_limitOrdersRepository.Update(_matchedLimitOrder);
+                // TODO: in case no "shares" remains in order we can remove it from order book
+                m_limitOrdersRepository.Update(_matchedLimitOrder);
 
-                // persist changes in placed order
-                // TODO: _placedOrder
+                // TODO: persist changes in placed order
+                // m_limitOrdersRepository.Update(placedOrder);
 
                 // calculate price
                 var _actualPrice = price.HasValue ? (_matchedLimitOrder.Price + price.Value) / 2 : _matchedLimitOrder.Price;
 
                 // fire event for found match
+                processedOrdersEvents(placedOrder, _matchedLimitOrder, _handledShares, _actualPrice);
+            }
+        }
+        
+        private void matchInOrdersQueue(LimitOrder placedOrder)
+        {
+            while (placedOrder.CurrentSharesCount > 0)
+            {
+                var _matchedMarketOrder = m_ordersQueue.FindMatch(
+                    placedOrder.OrderType == OrderType.Buy ? OrderType.Sell : OrderType.Buy, placedOrder.Symbol);
+
+                if (_matchedMarketOrder == null) break;
+
+                // update shares number in both orders (requested and matched)
+                var _handledShares = transferOrdersShares(placedOrder, _matchedMarketOrder);
+
+                // persist matched order
+                // TODO: in case no "shares" remains in order we can remove it from queue
+                m_marketOrdersRepository.Update(_matchedMarketOrder);
+                
+                // persist changes in placed order
+                m_limitOrdersRepository.Update(placedOrder);
+                
+                // fire event for found match
+                processedOrdersEvents(placedOrder, _matchedMarketOrder, _handledShares, placedOrder.Price);
+            }
+        }
+
+        /// <summary>
+        /// Transfer shares from one order to another
+        /// </summary>
+        /// <returns>Number of transfered shares</returns>
+        private int transferOrdersShares(Order placedOrder, Order matchedOrder)
+        {
+            var _handledShares = 0;
+            if (matchedOrder.CurrentSharesCount >= placedOrder.CurrentSharesCount)
+            {
+                matchedOrder.CurrentSharesCount -= placedOrder.CurrentSharesCount;
+                _handledShares = placedOrder.CurrentSharesCount;
+                placedOrder.CurrentSharesCount = 0;
+            }
+            else
+            {
+                placedOrder.CurrentSharesCount -= matchedOrder.OriginalSharesCount;
+                _handledShares = matchedOrder.OriginalSharesCount;
+                matchedOrder.CurrentSharesCount = 0;
+            }
+            return _handledShares;
+        }
+
+        private void processedOrdersEvents(Order placedOrder, Order matchedOrder, int transferedShares, double price)
+        {
+            m_publisher.Send(
+                typeof(PartialFilledEvent).Name,
+                new PartialFilledEvent
+                {
+                    BuyOrderId = placedOrder.OrderType == OrderType.Buy ? placedOrder.Id : matchedOrder.Id,
+                    SellOrderId = placedOrder.OrderType == OrderType.Sell ? placedOrder.Id : matchedOrder.Id,
+                    Price = price,
+                    Shares = transferedShares
+                }.ToJSON());
+
+            // fire event for placed order fill
+            if (placedOrder.CurrentSharesCount == 0)
+            {
                 m_publisher.Send(
-                    typeof(PartialFilledEvent).Name,
-                    new PartialFilledEvent
+                    typeof(FilledEvent).Name,
+                    new FilledEvent
                     {
-                        BuyOrderId = placedOrder.OrderType == OrderType.Buy ? placedOrder.Id : _matchedLimitOrder.Id,
-                        SellOrderId = placedOrder.OrderType == OrderType.Sell ? placedOrder.Id : _matchedLimitOrder.Id,
-                        Price = _actualPrice,
-                        Shares = _handledShares
+                        OrderId = placedOrder.Id,
+                        AveragePrice = price
                     }.ToJSON());
+            }
 
-                // fire event for placed order fill
-                if (placedOrder.CurrentSharesCount == 0)
-                {
-                    m_publisher.Send(
-                        typeof(FilledEvent).Name,
-                        new FilledEvent
-                        {
-                            OrderId = placedOrder.Id,
-                            AveragePrice = _actualPrice
-                        }.ToJSON());
-                }
-
-                // fire event for matched order fill
-                if (_matchedLimitOrder.CurrentSharesCount == 0)
-                {
-                    m_publisher.Send(
-                        typeof(FilledEvent).Name,
-                        new FilledEvent
-                        {
-                            OrderId = _matchedLimitOrder.Id,
-                            AveragePrice = _actualPrice
-                        }.ToJSON());
-                }
+            // fire event for matched order fill
+            if (matchedOrder.CurrentSharesCount == 0)
+            {
+                m_publisher.Send(
+                    typeof(FilledEvent).Name,
+                    new FilledEvent
+                    {
+                        OrderId = matchedOrder.Id,
+                        AveragePrice = price
+                    }.ToJSON());
             }
         }
 
