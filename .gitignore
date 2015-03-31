@@ -15,6 +15,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
+coverage.xml
 
 # Roslyn cache directories
 *.ide/
