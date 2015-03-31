@@ -1,4 +1,7 @@
 # Exchange Matching Engine
+
+[![Build status](https://ci.appveyor.com/api/projects/status/mojrg54k455hkks5/branch/master?svg=true)](https://ci.appveyor.com/project/jenyayel/exchangematchingengine/branch/master)
+
 Naive implementation of stocks exchange matching engine using [netmq](https://github.com/zeromq/netmq) and [actor model](http://en.wikipedia.org/wiki/Actor_model).
 
 The API of engine exposed via two TCP sockets - one for sending commands and second for receiving events. 
